@@ -58,7 +58,7 @@ def mostrar_resultado_ganador(ganador, archivo_ganadores, fondo_path=None):
     etiqueta_sorteo = tk.Label(ventana_resultado, text="¡Resultado del Sorteo!", font=("Arial", 20), fg="red")
     etiqueta_sorteo.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
-    etiqueta_ganador = tk.Label(ventana_resultado, text=f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!", font=("Arial", 15), fg="black")
+    etiqueta_ganador = tk.Label(ventana_resultado, text=f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!", font=("Arial", 14), fg="black")
     etiqueta_ganador.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     guardar_ganador(ganador, archivo_ganadores)
@@ -69,6 +69,21 @@ def mostrar_resultado_ganador(ganador, archivo_ganadores, fondo_path=None):
     x = (width - fondo_img.width) // 2
     y = (height - fondo_img.height) // 2
     ventana_resultado.geometry('{}x{}+{}+{}'.format(fondo_img.width, fondo_img.height, x, y))
+
+    # Configuramos la ventana para que sea de solo lectura
+    ventana_resultado.overrideredirect(True)
+    ventana_resultado.transient(ventana_resultado.master)
+
+    # Configuramos la ventana para ser redimensionable
+    ventana_resultado.resizable(True, True)
+
+    # Configuramos el evento de cerrar ventana
+    ventana_resultado.protocol("WM_DELETE_WINDOW", lambda: cerrar_ventana(ventana_resultado))
+
+    ventana_resultado.mainloop()
+
+def cerrar_ventana(ventana):
+    ventana.destroy()
 
 def cargar_participantes_sucursal(script_dir, sucursal):
     archivo = ""
@@ -97,31 +112,36 @@ def main():
     fondo_path = os.path.join(script_dir, 'fondo.jpeg')
 
     def sortear_y_mostrar_resultado(sucursal):
-        participantes = cargar_participantes_sucursal(script_dir, sucursal)
-        if not participantes:
-            print("No hay participantes o hay un error en la carga.")
+        participantes_sucursal = cargar_participantes_sucursal(script_dir, sucursal)
+        if not participantes_sucursal:
+            print(f"No hay participantes o hay un error en la carga de la sucursal {sucursal}.")
             return
 
-        ganador = random.choice(participantes)
+        ganador = random.choice(participantes_sucursal)
         mostrar_resultado_ganador(ganador, archivo_ganadores, fondo_path)
 
-    def seleccionar_sucursal(sucursal):
-        sortear_y_mostrar_resultado(sucursal)
+    def cargar_y_sortear_sucursal1():
+        sortear_y_mostrar_resultado(1)
+
+    def cargar_y_sortear_sucursal2():
+        sortear_y_mostrar_resultado(2)
+
+    def cargar_y_sortear_sucursal3():
+        sortear_y_mostrar_resultado(3)
 
     ventana_principal = tk.Tk()
     ventana_principal.title("Sorteo por Sucursal")
 
-    boton_sucursal1 = tk.Button(ventana_principal, text="Sucursal 1", command=lambda: seleccionar_sucursal(1))
-    boton_sucursal1.pack()
+    boton_sucursal1 = tk.Button(ventana_principal, text="Sucursal 1", command=cargar_y_sortear_sucursal1)
+    boton_sucursal1.pack(side=tk.LEFT, padx=10)
 
-    boton_sucursal2 = tk.Button(ventana_principal, text="Sucursal 2", command=lambda: seleccionar_sucursal(2))
-    boton_sucursal2.pack()
+    boton_sucursal2 = tk.Button(ventana_principal, text="Sucursal 2", command=cargar_y_sortear_sucursal2)
+    boton_sucursal2.pack(side=tk.LEFT, padx=10)
 
-    boton_sucursal3 = tk.Button(ventana_principal, text="Sucursal 3", command=lambda: seleccionar_sucursal(3))
-    boton_sucursal3.pack()
+    boton_sucursal3 = tk.Button(ventana_principal, text="Sucursal 3", command=cargar_y_sortear_sucursal3)
+    boton_sucursal3.pack(side=tk.LEFT, padx=10)
 
     ventana_principal.mainloop()
 
 if __name__ == "__main__":
-    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     main()
