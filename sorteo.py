@@ -2,10 +2,7 @@ import random
 import tkinter as tk
 from PIL import Image, ImageTk
 import os
-import ctypes
 import openpyxl
-
-fondo_photo = None  # Variable global para mantener la referencia a la imagen de fondo
 
 def cargar_participantes(archivo, factura_col, nombre_col):
     try:
@@ -39,18 +36,12 @@ def guardar_ganador(ganador, archivo_ganadores):
         file.write(f"{ganador['NOMBRE']},{ganador['FACTURA']}\n")
 
 def mostrar_resultado_ganador(ganador, archivo_ganadores, fondo_path=None):
-    global fondo_photo
-
-    ventana_resultado = tk.Toplevel()  # Cambiamos a Toplevel para nuevas ventanas
+    ventana_resultado = tk.Toplevel()
     ventana_resultado.title("Resultado del Sorteo")
-
-    icono_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.ico')
-    if os.path.exists(icono_path):
-        ventana_resultado.iconbitmap(default=icono_path)
 
     if fondo_path and os.path.exists(fondo_path):
         fondo_img = Image.open(fondo_path)
-        fondo_photo = ImageTk.PhotoImage(fondo_img)  # Asigna a la variable global
+        fondo_photo = ImageTk.PhotoImage(fondo_img)
         fondo_label = tk.Label(ventana_resultado, image=fondo_photo)
         fondo_label.image = fondo_photo
         fondo_label.pack(fill=tk.BOTH, expand=True)
@@ -58,32 +49,13 @@ def mostrar_resultado_ganador(ganador, archivo_ganadores, fondo_path=None):
     etiqueta_sorteo = tk.Label(ventana_resultado, text="¡Resultado del Sorteo!", font=("Arial", 20), fg="red")
     etiqueta_sorteo.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
-    etiqueta_ganador = tk.Label(ventana_resultado, text=f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!", font=("Arial", 14), fg="black")
+    etiqueta_ganador_texto = f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!"
+    etiqueta_ganador = tk.Label(ventana_resultado, text=etiqueta_ganador_texto, font=("Arial", 15), fg="black", wraplength=400)
     etiqueta_ganador.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     guardar_ganador(ganador, archivo_ganadores)
 
-    ventana_resultado.update_idletasks()
-    width = ventana_resultado.winfo_screenwidth()
-    height = ventana_resultado.winfo_screenheight()
-    x = (width - fondo_img.width) // 2
-    y = (height - fondo_img.height) // 2
-    ventana_resultado.geometry('{}x{}+{}+{}'.format(fondo_img.width, fondo_img.height, x, y))
-
-    # Configuramos la ventana para que sea de solo lectura
-    ventana_resultado.overrideredirect(True)
-    ventana_resultado.transient(ventana_resultado.master)
-
-    # Configuramos la ventana para ser redimensionable
-    ventana_resultado.resizable(True, True)
-
-    # Configuramos el evento de cerrar ventana
-    ventana_resultado.protocol("WM_DELETE_WINDOW", lambda: cerrar_ventana(ventana_resultado))
-
     ventana_resultado.mainloop()
-
-def cerrar_ventana(ventana):
-    ventana.destroy()
 
 def cargar_participantes_sucursal(script_dir, sucursal):
     archivo = ""
