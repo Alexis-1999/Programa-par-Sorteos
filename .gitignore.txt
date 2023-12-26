@@ -1,3 +1,11 @@
 .participantes.xlsx
 
 .ganadores.txt
+
+.FACTURASSANLOAL25
+
+.FACTURASNEMBYAL25
+
+.KM6AL25
+
+Nueva carpeta/*
