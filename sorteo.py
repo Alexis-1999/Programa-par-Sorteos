@@ -1,4 +1,3 @@
-import ctypes
 import tkinter.ttk as ttk
 import random
 import tkinter as tk
@@ -106,15 +105,15 @@ def cargar_participantes_sucursal(script_dir, sucursal):
     nombre_col = 0
 
     if sucursal == 1:
-        archivo = os.path.join(script_dir, 'FACTURASÑEMBYF.xlsx')
+        archivo = os.path.abspath('FACTURASÑEMBYF.xlsx')
         factura_col = 4
         nombre_col = 5
     elif sucursal == 2:
-        archivo = os.path.join(script_dir, 'SANLOFACTURAS.xlsx')
+        archivo = os.path.abspath('SANLOFACTURAS.xlsx')
         factura_col = 4
         nombre_col = 5
     elif sucursal == 3:
-        archivo = os.path.join(script_dir, 'FACTURAS07KM6.xlsx')
+        archivo = os.path.abspath('FACTURAS07KM6.xlsx')
         factura_col = 4
         nombre_col = 5
 
@@ -123,8 +122,8 @@ def cargar_participantes_sucursal(script_dir, sucursal):
 
 def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    archivo_ganadores = os.path.join(script_dir, 'ganadores.txt')
-    fondo_path = os.path.join(script_dir, 'fondo.jpeg')
+    archivo_ganadores = os.path.abspath('ganadores.txt')
+    fondo_path = os.path.abspath('fondo.jpeg')
 
     def sortear_y_mostrar_resultado(sucursal, loading_label):
         loading_label.config(text="SORTEANDO GANADOR DE LA PROMO...")
@@ -145,6 +144,12 @@ def main():
     ventana_principal = tk.Tk()
     ventana_principal.title("Sorteo por Sucursal")
 
+    # Añadir el siguiente bloque para establecer el icono
+    ruta_icono = "icon.ico"  # Cambia esto con la ruta de tu icono
+    if os.path.exists(ruta_icono):
+        ventana_principal.iconbitmap(default=ruta_icono)
+        ventana_principal.wm_iconbitmap(ruta_icono)  # Establece el ícono para la barra de tareas
+
     loading_label = tk.Label(ventana_principal, text="", font=("Arial", 12), fg="blue")
     loading_label.pack(pady=10)
 
@@ -163,5 +168,6 @@ def main():
     ventana_principal.mainloop()
 
 if __name__ == "__main__":
+    import ctypes
     ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     main()
