@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 import os
 import openpyxl
 import threading
+import time
 
 def cargar_participantes(archivo, factura_col, nombre_col):
     try:
@@ -18,8 +19,13 @@ def cargar_participantes(archivo, factura_col, nombre_col):
 
         participantes = []
         for row in participantes_sheet.iter_rows(min_row=3, values_only=True):
-            participante = {'FACTURA': row[factura_col], 'NOMBRE': row[nombre_col]}
-            participantes.append(participante)
+            nombre = row[nombre_col]
+            factura = row[factura_col]
+
+            # Verificar si el nombre es "SIN NOMBRE" y omitirlo
+            if nombre != "SIN NOMBRE":
+                participante = {'FACTURA': factura, 'NOMBRE': nombre}
+                participantes.append(participante)
 
         participantes_wb.close()
     except FileNotFoundError:
@@ -50,8 +56,7 @@ def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fon
     ventana_resultado = tk.Toplevel()
     ventana_resultado.title("Resultado del Sorteo")
 
-    # Agregar el icono a la ventana
-    ruta_icono = "icon.ico"  # Reemplazar con la ruta correcta del archivo .ico
+    ruta_icono = "icon.ico"
     if os.path.exists(ruta_icono):
         ventana_resultado.iconbitmap(default=ruta_icono)
 
@@ -66,23 +71,25 @@ def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fon
     etiqueta_sorteo = tk.Label(ventana_resultado, text="¡Resultado del Sorteo!", font=("Arial", 20), fg="red")
     etiqueta_sorteo.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
 
-    etiqueta_ganador_texto = f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!"
+    if ganador['NOMBRE'] != "SIN NOMBRE":
+        etiqueta_ganador_texto = f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!"
+    else:
+        etiqueta_ganador_texto = f"¡El ganador es el número de factura {ganador['FACTURA']}!"
+
     etiqueta_ganador = tk.Label(ventana_resultado, text=etiqueta_ganador_texto, font=("Arial", 15), fg="black", wraplength=400)
     etiqueta_ganador.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     guardar_ganador(ganador, archivo_ganadores)
 
-    # Crear un estilo
     style = ttk.Style()
     style.configure("TButton",
-                font=("Arial", 12),
-                padding=10,
-                foreground="black",
-                background="red",
-                border= "white 8px groove",
-                )
+                    font=("Arial", 12),
+                    padding=10,
+                    foreground="black",
+                    background="red",
+                    border="white 8px groove",
+                    )
 
-    # Crear el botón con el estilo
     boton_cerrar = ttk.Button(ventana_resultado, text="Cerrar", command=ventana_resultado.destroy, style="TButton")
     boton_cerrar.place(relx=0.5, rely=0.8, anchor=tk.CENTER)
 
@@ -91,8 +98,6 @@ def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fon
 
     if loading_label:
         loading_label.config(text="")
-    
-    # Mostrar la ventana principal nuevamente
     ventana_principal.deiconify()
 
 def cargar_participantes_sucursal(script_dir, sucursal):
@@ -102,16 +107,16 @@ def cargar_participantes_sucursal(script_dir, sucursal):
 
     if sucursal == 1:
         archivo = os.path.join(script_dir, 'FACTURASNEMBYAL25.xlsx')
-        factura_col = 4  # Columna E
-        nombre_col = 5   # Columna F
+        factura_col = 4
+        nombre_col = 5
     elif sucursal == 2:
         archivo = os.path.join(script_dir, 'FACTURASSANLOAL25.xlsx')
-        factura_col = 4  # Columna E
-        nombre_col = 5   # Columna F
+        factura_col = 4
+        nombre_col = 5
     elif sucursal == 3:
         archivo = os.path.join(script_dir, 'KM6AL25.xlsx')
-        factura_col = 4  # Columna E
-        nombre_col = 5   # Columna F
+        factura_col = 4
+        nombre_col = 5
 
     participantes = cargar_participantes(archivo, factura_col, nombre_col)
     return participantes
@@ -122,23 +127,16 @@ def main():
     fondo_path = os.path.join(script_dir, 'fondo.jpeg')
 
     def sortear_y_mostrar_resultado(sucursal, loading_label):
-        loading_label.config(text="Cargando participantes, espere...")
+        loading_label.config(text="SORTEANDO GANADOR DE LA PROMO...")
 
         participantes_sucursal = cargar_participantes_sucursal(script_dir, sucursal)
         if not participantes_sucursal:
             loading_label.config(text=f"No hay participantes o hay un error en la carga de la sucursal {sucursal}.")
             return
 
+        time.sleep(10)  # Pausa de 10 segundos
+
         ganador = random.choice(participantes_sucursal)
-        
-        ventana_resultado = tk.Toplevel()
-        ventana_resultado.title("Resultado del Sorteo")
-        ventana_resultado.withdraw()  # Ocultar la ventana de resultado
-
-        ventana_principal.withdraw()  # Ocultar la ventana principal
-        loading_label.config(text="Mostrando resultado...")
-
-        # Mostrar el resultado sin esperar
         mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fondo_path, loading_label)
 
     def cargar_y_sortear_sucursal(sucursal, loading_label):
@@ -150,7 +148,6 @@ def main():
     loading_label = tk.Label(ventana_principal, text="", font=("Arial", 12), fg="blue")
     loading_label.pack(pady=10)
 
-    # Utilizar grid para organizar los botones de manera más flexible
     botones_frame = tk.Frame(ventana_principal)
     botones_frame.pack(pady=10)
 
@@ -166,6 +163,5 @@ def main():
     ventana_principal.mainloop()
 
 if __name__ == "__main__":
-    # Ocultar la ventana de la consola
     ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     main()
