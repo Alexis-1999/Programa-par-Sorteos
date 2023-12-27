@@ -106,15 +106,15 @@ def cargar_participantes_sucursal(script_dir, sucursal):
     nombre_col = 0
 
     if sucursal == 1:
-        archivo = os.path.join(script_dir, 'FACTURASNEMBYAL25.xlsx')
+        archivo = os.path.join(script_dir, 'FACTURASÑEMBYF.xlsx')
         factura_col = 4
         nombre_col = 5
     elif sucursal == 2:
-        archivo = os.path.join(script_dir, 'FACTURASSANLOAL25.xlsx')
+        archivo = os.path.join(script_dir, 'SANLOFACTURAS.xlsx')
         factura_col = 4
         nombre_col = 5
     elif sucursal == 3:
-        archivo = os.path.join(script_dir, 'KM6AL25.xlsx')
+        archivo = os.path.join(script_dir, 'FACTURAS07KM6.xlsx')
         factura_col = 4
         nombre_col = 5
 
