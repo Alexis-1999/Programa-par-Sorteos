@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['c:/Users/TECNO PAGE/Desktop/Amigo SRL/sorteo.py'],
+    ['sorteo.py'],
     pathex=[],
     binaries=[],
     datas=[],

@@ -2,10 +2,12 @@
 
 .ganadores.txt
 
-.FACTURASSANLOAL25
+.SANLOFACTURAS.xlsx
 
-.FACTURASNEMBYAL25
+.FFACTURASÑEMBYF.xlsx
 
-.KM6AL25
+.FACTURAS07KM6.xlsx
+
+.dist.rar
 
 Nueva carpeta/*
