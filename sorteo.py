@@ -134,7 +134,7 @@ def main():
             loading_label.config(text=f"No hay participantes o hay un error en la carga de la sucursal {sucursal}.")
             return
 
-        time.sleep(0)  # Pausa de 10 segundos
+        time.sleep(10)  # Pausa de 10 segundos
 
         ganador = random.choice(participantes_sucursal)
         mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fondo_path, loading_label)
