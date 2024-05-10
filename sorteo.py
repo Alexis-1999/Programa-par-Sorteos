@@ -43,11 +43,12 @@ def guardar_ganador(ganador, archivo_ganadores):
     with open(archivo_ganadores, 'a') as file:
         file.write(f"{ganador['NOMBRE']},{ganador['FACTURA']}\n")
 
-def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fondo_path=None, loading_label=None, ventana_width=800, ventana_height=600):
+def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fondo_path=None, loading_label=None, ventana_width=600, ventana_height=600):
     ventana_principal.withdraw()  # Ocultar la ventana principal temporalmente
 
     ventana_resultado = tk.Toplevel()
     ventana_resultado.title("Resultado del Sorteo")
+    ventana_resultado.geometry(f"{ventana_width}x{ventana_height}")
 
     ruta_icono = "icon.ico"
     if os.path.exists(ruta_icono):
@@ -57,17 +58,18 @@ def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fon
         fondo_img = Image.open(fondo_path)
         fondo_width, fondo_height = fondo_img.size
 
-        fondo_photo = ImageTk.PhotoImage(fondo_img)
+        fondo_img_resized = fondo_img.resize((ventana_width, ventana_height), Image.LANCZOS)
+        fondo_photo = ImageTk.PhotoImage(fondo_img_resized)
 
         fondo_label = tk.Label(ventana_resultado, image=fondo_photo)
         fondo_label.image = fondo_photo
-        fondo_label.place(x=0, y=0, relwidth=1, relheight=1)  # Asegurar que la imagen de fondo cubra toda la ventana
+        fondo_label.place(x=0, y=0, relwidth=1, relheight=1)  # Utilizar coordenadas y dimensiones relativas al tamaño de la ventana
 
         etiqueta_sorteo = tk.Label(ventana_resultado, text="¡Resultado del Sorteo!", font=("Arial", 20), fg="red")
-        etiqueta_sorteo.place(relx=0.5, rely=0.1, anchor=tk.CENTER)  # Centrar el texto del sorteo en la parte superior de la ventana
+        etiqueta_sorteo.place(relx=0.5, rely=0.4, anchor=tk.CENTER)  # Centrar el texto del sorteo en la parte superior de la ventana
 
         marco_central = tk.Frame(ventana_resultado)
-        marco_central.place(relx=0.5, rely=0.4, anchor=tk.CENTER)  # Centrar el marco en el medio de la ventana
+        marco_central.place(relx=0.5, rely=0.5, anchor=tk.CENTER)  # Centrar el marco en el medio de la ventana
 
     if ganador['NOMBRE'] != "SIN NOMBRE":
         etiqueta_ganador_texto = f"¡El ganador es {ganador['NOMBRE']} con el número de factura {ganador['FACTURA']}!"
@@ -78,10 +80,6 @@ def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fon
     etiqueta_ganador.insert(tk.END, etiqueta_ganador_texto)
     etiqueta_ganador.configure(state='disabled', bd=0, highlightthickness=0)
     etiqueta_ganador.pack()
-
-
-    # Establecer el fondo transparente y eliminar el borde y el resaltado
-    etiqueta_ganador.config(bd=0, highlightthickness=0)
 
     guardar_ganador(ganador, archivo_ganadores)
 
@@ -97,22 +95,10 @@ def mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fon
     boton_cerrar = ttk.Button(marco_central, text="Cerrar", command=ventana_resultado.destroy, style="TButton")
     boton_cerrar.pack()
 
-    ventana_resultado.geometry(f"{ventana_width}x{ventana_height}")  # Establecer tamaño de la ventana según los parámetros proporcionados
-
     if loading_label:
         loading_label.config(text="")
 
-    # Centrar la ventana en la pantalla
-    ventana_resultado.update_idletasks()
-    width = ventana_resultado.winfo_width()
-    height = ventana_resultado.winfo_height()
-    x = (ventana_resultado.winfo_screenwidth() // 2) - (width // 2)
-    y = (ventana_resultado.winfo_screenheight() // 2) - (height // 2)
-    ventana_resultado.geometry(f"+{x}+{y}")
-
     ventana_principal.deiconify()  # Mostrar nuevamente la ventana principal
-
-
 
 def cargar_participantes_sucursal(script_dir, sucursal):
     archivo = ""
@@ -148,10 +134,10 @@ def main():
             loading_label.config(text=f"No hay participantes o hay un error en la carga de la sucursal {sucursal}.")
             return
 
-        time.sleep(10)  # Pausa de 10 segundos
+        time.sleep(0)  # Pausa de 10 segundos
 
         ganador = random.choice(participantes_sucursal)
-        mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fondo_path, loading_label, ventana_width=800, ventana_height=800)
+        mostrar_resultado_ganador(ventana_principal, ganador, archivo_ganadores, fondo_path, loading_label)
 
     def cargar_y_sortear_sucursal(sucursal, loading_label):
         threading.Thread(target=lambda: sortear_y_mostrar_resultado(sucursal, loading_label)).start()
@@ -180,6 +166,10 @@ def main():
     boton_sucursal3 = tk.Button(botones_frame, text="Sucursal KM6", command=lambda: cargar_y_sortear_sucursal(3, loading_label), padx=20, pady=10)
     boton_sucursal3.grid(row=0, column=2, padx=10)
 
+    # Definir el tamaño inicial de la ventana principal
+    #ventana_principal.geometry("400x300")
+
+    # Iniciar el bucle principal de eventos
     ventana_principal.mainloop()
 
 if __name__ == "__main__":

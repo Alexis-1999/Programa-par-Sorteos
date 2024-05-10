@@ -1,5 +1,5 @@
-('C:\\Users\\TECNO PAGE\\Videos\\EScritorio\\Amigo '
- 'SRL\\build\\sorteo\\PYZ-00.pyz',
+('C:\\Users\\TECNO PAGE\\Desktop\\Amigo '
+ 'SRL\\Sorteo\\Programa-par-Sorteos\\build\\sorteo\\PYZ-00.pyz',
  [('PIL',
    'C:\\Python\\Python312\\Lib\\site-packages\\PIL\\__init__.py',
    'PYMODULE'),
